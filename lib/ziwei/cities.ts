@@ -6,6 +6,8 @@ export interface CityInfo {
 export interface ProvinceInfo {
   name: string;
   cities: CityInfo[];
+  /** 该地区钟表时区的标准偏移（分钟）；不填 = 北京时间 480 */
+  utcOffsetMinutes?: number;
 }
 
 // ★ 2026-10-07 用户反馈「出生地点还不够全」→ 补全全国区县（直辖市以外 2724 个，挂在各地级市下）。

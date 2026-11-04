@@ -5,6 +5,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ALL_BOOKS, getChapter } from '@/lib/classics';
+import { bookDynastyVi, bookTitleVi } from '@/lib/i18n/pages-extra';
+import { chapterVi, paragraphVi } from '@/lib/i18n/classics-vi';
 
 export async function generateStaticParams() {
   return ALL_BOOKS.flatMap(b =>
@@ -16,9 +18,10 @@ export async function generateMetadata({ params }: { params: Promise<{ book: str
   const { book: bookSlug, chapter: chIdx } = await params;
   const result = getChapter(bookSlug, parseInt(chIdx));
   if (!result) return {};
+  const ch = chapterVi(result.book.slug, result.chapterIdx, result.chapter);
   return {
-    title: `${result.chapter.title} · 《${result.book.title}》· 紫微斗数古籍`,
-    description: result.chapter.subtitle || `《${result.book.title}》${result.chapter.title}原文`,
+    title: `${ch.title} · ${bookTitleVi(result.book.title)} · Cổ thư Tử Vi Đẩu Số`,
+    description: ch.subtitle || `${bookTitleVi(result.book.title)} · nguyên văn ${ch.title}`,
   };
 }
 
@@ -30,19 +33,21 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
   const { book, chapter, chapterIdx } = result;
   const prevIdx = chapterIdx - 1;
   const nextIdx = chapterIdx + 1;
+  const chVi = chapterVi(book.slug, chapterIdx, chapter);
+  const chTitleAt = (i: number) => chapterVi(book.slug, i, book.chapters[i]).title;
 
   return (
     <div style={{ background: 'var(--bg-page)', minHeight: '100vh' }}>
-      <div className="px-6 py-4 flex items-center justify-between"
+      <div className="px-6 py-4 flex items-center justify-between gap-3"
         style={{ borderBottom: '1px solid rgba(184,146,42,0.15)', background: 'var(--bg-page)' }}>
-        <Link href={`/library/${book.slug}`} style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.3em', textDecoration: 'none' }}>
-          ← 《{book.title}》目录
+        <Link href={`/library/${book.slug}`} style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.3em', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0, maxWidth: '45%', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          ← {bookTitleVi(book.title)} · Mục lục
         </Link>
-        <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.15em' }}>
-          {chapter.title}
+        <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.15em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {chVi.title}
         </div>
-        <Link href="/library" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', textDecoration: 'none' }}>
-          古籍库 →
+        <Link href="/library" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          Thư viện cổ thư →
         </Link>
       </div>
 
@@ -50,14 +55,14 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
         {/* 标题 */}
         <div className="text-center mb-10">
           <div style={{ fontSize: '11px', color: 'var(--tx-3)', letterSpacing: '0.25em', marginBottom: '8px' }}>
-            《{book.title}》· {book.dynasty}
+            {bookTitleVi(book.title)} · {bookDynastyVi(book)}
           </div>
           <h1 style={{ fontSize: 'clamp(24px, 3.5vw, 36px)', fontWeight: 700, color: 'var(--tx-0)', letterSpacing: '0.15em', marginBottom: '8px' }}>
-            {chapter.title}
+            {chVi.title}
           </h1>
-          {chapter.subtitle && (
+          {chVi.subtitle && (
             <div style={{ fontSize: '13px', color: 'var(--tx-2)', letterSpacing: '0.1em' }}>
-              {chapter.subtitle}
+              {chVi.subtitle}
             </div>
           )}
         </div>
@@ -100,7 +105,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                   {p.text}
                 </p>
               </div>
-              {p.translation && (
+              {(p.translation ?? paragraphVi(p.id)) && (
                 <div style={{
                   marginTop: '8px',
                   marginLeft: '36px',
@@ -111,8 +116,8 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                   color: 'var(--tx-2)',
                   lineHeight: 1.8,
                 }}>
-                  <span style={{ fontSize: '10px', color: 'var(--ac)', marginRight: '6px' }}>白话</span>
-                  {p.translation}
+                  <span style={{ fontSize: '10px', color: 'var(--ac)', marginRight: '6px' }}>Dịch nghĩa</span>
+                  {p.translation ?? paragraphVi(p.id)}
                 </div>
               )}
               {p.niNote && (
@@ -126,7 +131,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                   color: 'var(--tx-2)',
                   lineHeight: 1.8,
                 }}>
-                  <span style={{ fontSize: '10px', color: 'var(--ji)', marginRight: '6px' }}>倪师注</span>
+                  <span style={{ fontSize: '10px', color: 'var(--ji)', marginRight: '6px' }}>Chú của Nghê sư</span>
                   {p.niNote}
                 </div>
               )}
@@ -149,8 +154,8 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                 color: 'var(--tx-0)',
               }}
             >
-              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.2em', marginBottom: '2px' }}>← 上一章</div>
-              <div style={{ fontSize: '13px', fontWeight: 500 }}>{book.chapters[prevIdx].title}</div>
+              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.2em', marginBottom: '2px' }}>← Chương trước</div>
+              <div style={{ fontSize: '13px', fontWeight: 500 }}>{chTitleAt(prevIdx)}</div>
             </Link>
           ) : <div style={{ flex: 1 }} />}
           {nextIdx < book.chapters.length ? (
@@ -167,8 +172,8 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                 textAlign: 'right',
               }}
             >
-              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.2em', marginBottom: '2px' }}>下一章 →</div>
-              <div style={{ fontSize: '13px', fontWeight: 500 }}>{book.chapters[nextIdx].title}</div>
+              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.2em', marginBottom: '2px' }}>Chương sau →</div>
+              <div style={{ fontSize: '13px', fontWeight: 500 }}>{chTitleAt(nextIdx)}</div>
             </Link>
           ) : <div style={{ flex: 1 }} />}
         </div>

@@ -36,9 +36,10 @@ export default function LibrarySearch() {
         value={q}
         onChange={e => setQ(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && submit()}
-        placeholder="搜索古籍原文，如：七杀朝斗 / 双禄朝垣 / 化忌"
+        placeholder="Tìm trong cổ thư (chữ Hán hoặc tiếng Việt), ví dụ: Thất Sát / song lộc / 化忌"
         style={{
           flex: 1,
+          minWidth: 0,
           padding: '10px 14px',
           border: 'none',
           outline: 'none',
@@ -59,11 +60,12 @@ export default function LibrarySearch() {
           fontSize: '13px',
           fontWeight: 600,
           letterSpacing: '0.15em',
+          whiteSpace: 'nowrap',
           cursor: q.trim() ? 'pointer' : 'not-allowed',
           opacity: q.trim() ? 1 : 0.5,
         }}
       >
-        {isPending ? '…' : '搜索'}
+        {isPending ? '…' : 'Tìm kiếm'}
       </button>
     </div>
   );

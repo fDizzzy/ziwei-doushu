@@ -4,31 +4,34 @@
  */
 
 import Link from 'next/link';
-import { ALL_STARS, ALL_TOPICS, getKnowledge, STAR_BRIEF_SEO, STAR_TO_SLUG } from '@/lib/seo/knowledge';
+import { ALL_STARS, ALL_TOPICS, getKnowledge, STAR_TO_SLUG } from '@/lib/seo/knowledge';
+import { STAR_BRIEF_VI } from '@/lib/i18n/knowledge-vi';
 import { TOPIC_LABEL } from '@/lib/ziwei/db-analysis';
+import { tv } from '@/lib/i18n/vi';
+import { topicLabelVi } from '@/lib/i18n/pages-extra';
 
 export const metadata = {
-  title: '紫微斗数知识库 · 14 主星 × 13 宫位 · 倪海厦正宗体系',
-  description: '基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》编纂的紫微斗数知识库。覆盖 14 主星在 13 个宫位的完整论断，含一句话定调、核心论断、命盘依据、经典出处。',
-  keywords: ['紫微斗数', '倪海厦', '倪海厦紫微斗数', '紫微斗数全集', '紫微斗数全书', '14 主星', '12 宫位'],
+  title: 'Kho tri thức Tử Vi Đẩu Số · 14 chính tinh × 13 cung vị · Hệ thống chính tông của Nghê Hải Hạ',
+  description: 'Kho tri thức Tử Vi Đẩu Số biên soạn dựa trên hệ thống «Thiên Kỷ» của Nghê Hải Hạ và các cổ thư «Tử Vi Đẩu Số Toàn Tập», «Cốt Tủy Phú». Bao quát luận đoán đầy đủ của 14 chính tinh tại 13 cung vị, gồm định điều trong một câu, luận đoán cốt lõi, căn cứ trên lá số và xuất xứ kinh điển.',
+  keywords: ['Tử Vi Đẩu Số', 'Nghê Hải Hạ', 'Tử Vi Đẩu Số Nghê Hải Hạ', 'Tử Vi Đẩu Số Toàn Tập', 'Tử Vi Đẩu Số Toàn Thư', '14 chính tinh', '12 cung'],
 };
 
 export default function KnowledgeHomePage() {
-  const STAR_DESCRIPTIONS_QUICK = STAR_BRIEF_SEO;
+  const STAR_DESCRIPTIONS_QUICK = STAR_BRIEF_VI;
 
   return (
     <div style={{ background: 'var(--bg-page)', minHeight: '100vh' }}>
       {/* 顶栏 */}
-      <div className="px-6 py-4 flex items-center justify-between"
+      <div className="px-6 py-4 flex items-center justify-between gap-3"
         style={{ borderBottom: '1px solid rgba(184,146,42,0.15)', background: 'var(--bg-page)' }}>
-        <Link href="/" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.3em', textDecoration: 'none' }}>
-          ← 首页
+        <Link href="/" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.3em', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          ← Trang chủ
         </Link>
-        <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.2em' }}>
-          倪师方法论 · 知识库
+        <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.2em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          Phương pháp luận của Nghê sư · Kho tri thức
         </div>
-        <Link href="/library" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', textDecoration: 'none' }}>
-          古籍 →
+        <Link href="/library" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          Cổ thư →
         </Link>
       </div>
 
@@ -40,18 +43,18 @@ export default function KnowledgeHomePage() {
           <div style={{ height: '1px', width: '48px', background: 'linear-gradient(to left, transparent, rgba(184,146,42,0.4))' }} />
         </div>
         <h1 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 700, color: 'var(--tx-0)', letterSpacing: '0.15em', marginBottom: '12px' }}>
-          紫微斗数知识库
+          Kho tri thức Tử Vi Đẩu Số
         </h1>
         <p style={{ fontSize: '14px', color: 'var(--tx-2)', letterSpacing: '0.08em', maxWidth: '600px', margin: '0 auto', lineHeight: 1.7 }}>
-          14 主星 × 13 宫位 = <strong style={{ color: 'var(--ac)' }}>{ALL_STARS.length * ALL_TOPICS.length}</strong> 项专题<br />
-          基于倪海厦《天纪》体系编纂 · 含古籍引证
+          14 chính tinh × 13 cung vị = <strong style={{ color: 'var(--ac)' }}>{ALL_STARS.length * ALL_TOPICS.length}</strong> chuyên đề<br />
+          Biên soạn theo hệ thống «Thiên Kỷ» của Nghê Hải Hạ · có dẫn chứng cổ thư
         </p>
       </div>
 
       {/* 14 主星卡片 */}
       <div className="max-w-5xl mx-auto px-6 pb-20">
         <div style={{ fontSize: '11px', color: 'var(--tx-3)', letterSpacing: '0.3em', textAlign: 'center', marginBottom: '24px' }}>
-          十四主星
+          Mười bốn chính tinh
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {ALL_STARS.map(star => (
@@ -71,7 +74,7 @@ export default function KnowledgeHomePage() {
               className="hover:shadow-md hover:border-amber-400"
             >
               <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--tx-0)', letterSpacing: '0.15em' }}>
-                {star}
+                {tv(star)}
               </div>
             </Link>
           ))}
@@ -88,7 +91,7 @@ export default function KnowledgeHomePage() {
             }}>
               <div className="flex items-baseline gap-3 mb-2">
                 <span style={{ fontSize: '20px', fontWeight: 700, color: 'var(--tx-0)', letterSpacing: '0.1em' }}>
-                  {star}星
+                  Sao {tv(star)}
                 </span>
                 <span style={{ fontSize: '11px', color: 'var(--tx-3)', letterSpacing: '0.15em' }}>
                   ZI WEI · 14 STARS
@@ -115,7 +118,7 @@ export default function KnowledgeHomePage() {
                         textDecoration: 'none',
                       }}
                     >
-                      入{k.palaceName} · {TOPIC_LABEL[t]}
+                      Nhập cung {tv(k.palaceName)} · {topicLabelVi(t, TOPIC_LABEL[t])}
                     </Link>
                   );
                 })}
