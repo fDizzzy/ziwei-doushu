@@ -5,6 +5,7 @@ import type { ZiweiChart, Palace } from '@/lib/ziwei/types';
 import type { TimeView } from './TimeNav';
 import { tv } from '@/lib/i18n/vi';
 import { palaceVi } from '@/lib/i18n/insight-extra';
+import { readSseText } from '@/lib/ai/sse';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -292,31 +293,18 @@ Những lời khuyên có thể thực hiện dựa trên Tứ Hóa này.`;
       if (!res.ok) throw new Error('request-failed');
       if (!res.body) throw new Error('no-stream');
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
       let assistantText = '';
 
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        for (const line of chunk.split('\n')) {
-          if (!line.startsWith('data: ')) continue;
-          const data = line.slice(6);
-          if (data === '[DONE]') break;
-          try {
-            const delta = JSON.parse(data).delta?.text ?? '';
-            assistantText += delta;
-            setMessages(prev => {
-              const updated = [...prev];
-              updated[updated.length - 1] = { role: 'assistant', content: assistantText };
-              return updated;
-            });
-          } catch { /* skip */ }
-        }
-      }
+      await readSseText(res.body, delta => {
+        assistantText += delta;
+        setMessages(prev => {
+          const updated = [...prev];
+          updated[updated.length - 1] = { role: 'assistant', content: assistantText };
+          return updated;
+        });
+      });
     } catch (e) {
       const missing = e instanceof Error && e.message === 'api-missing';
       setMessages(prev => [...prev, { role: 'assistant', content: missing ? 'Bản mã nguồn mở không kèm API luận giải AI (/api/interpret), bạn cần tự triển khai mới dùng được, xem README mục "Bắt đầu nhanh" (Quick Start). Lập lá số không cần API Key.' : 'Luận giải thất bại, vui lòng thử lại sau.' }]);
