@@ -3,6 +3,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import Script from 'next/script';
 import { SITE_URL } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -36,13 +37,13 @@ export const metadata: Metadata = {
   },
 };
 
+const THEME_INIT = `(function(){try{var t=localStorage.getItem('ziwei-theme');document.documentElement.setAttribute('data-theme',t==='light'||t==='dark'?t:'dark');}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('ziwei-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);else document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();` }} />
-      </head>
       <body className="min-h-screen">
+        <Script id="theme-init" strategy="beforeInteractive">{THEME_INIT}</Script>
         <ThemeProvider>
           {children}
         </ThemeProvider>
