@@ -2,13 +2,16 @@
 import { motion } from 'framer-motion';
 import type { ZiweiChart } from '@/lib/ziwei/types';
 import { BRANCHES, STEMS } from '@/lib/ziwei/constants';
-import { detectPatterns, getMingGongSummary } from '@/lib/ziwei/patterns';
+import type { Pattern } from '@/lib/ziwei/patterns';
 import { tv, tvGanzhi } from '@/lib/i18n/vi';
 import { tvPatternName, tvKeyword, tvNature } from '@/lib/i18n/chart-extra';
 import { tvPatternText, tvPatternList } from '@/lib/i18n/patterns-vi';
 
+// patterns.ts là server-only: phía server gọi detectPatterns / getMingGongSummary rồi truyền kết quả xuống.
 interface ChartSummaryProps {
   chart: ZiweiChart;
+  patterns: Pattern[];
+  mingSummary: { stars: string[]; keywords: string[]; nature: string };
 }
 
 const PatternLevelStyle = {
@@ -18,9 +21,8 @@ const PatternLevelStyle = {
   caution: { dot: 'bg-orange-500', label: 'text-orange-500', badge: 'text-orange-500 bg-orange-500/10 border-orange-500/25' },
 };
 
-export default function ChartSummary({ chart }: ChartSummaryProps) {
-  const patterns = detectPatterns(chart);
-  const { stars: mingStars, keywords, nature } = getMingGongSummary(chart);
+export default function ChartSummary({ chart, patterns, mingSummary }: ChartSummaryProps) {
+  const { stars: mingStars, keywords, nature } = mingSummary;
   const currentDx = chart.daXians[chart.currentDaXianIndex];
 
   const siHuaSummary: { name: string; siHua: string; palaceName: string }[] = [];

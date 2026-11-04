@@ -136,6 +136,27 @@ async function main() {
     assert.ok(!HAN.test(STAR_BRIEF_VI[k]), `${k}: còn chữ Hán`);
   }
 
+  // 6. Component client không được import giá trị từ module `server-only` (import type thì được, vì bị xóa khi build).
+  const { readdirSync, statSync } = await import('node:fs');
+  const root = new URL('../../', import.meta.url);
+  const walk = (dir: URL): URL[] => readdirSync(dir).flatMap(n => {
+    if (n === 'node_modules' || n === '.next' || n.startsWith('.')) return [];
+    const u = new URL(n + (statSync(new URL(n, dir)).isDirectory() ? '/' : ''), dir);
+    return u.pathname.endsWith('/') ? walk(u) : /\.tsx?$/.test(n) ? [u] : [];
+  });
+  const sources = [...walk(new URL('lib/', root)), ...walk(new URL('components/', root)), ...walk(new URL('app/', root))];
+  const serverOnly = sources.filter(u => /^\s*import\s+'server-only'/m.test(readFileSync(u, 'utf8')))
+    .map(u => u.pathname.replace(/^.*\/(lib\/.*)\.tsx?$/, '@/$1'));
+  assert.ok(serverOnly.length >= 2, 'không tìm thấy module server-only nào');
+  for (const u of sources) {
+    const code = readFileSync(u, 'utf8');
+    if (!/^\s*['"]use client['"]/.test(code)) continue;
+    for (const mod of serverOnly) {
+      const re = new RegExp(`^\\s*import\\s+(?!type\\b)[^;]*from\\s+['"]${mod.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`, 'm');
+      assert.ok(!re.test(code), `${u.pathname} ('use client') import giá trị từ module server-only ${mod}`);
+    }
+  }
+
   assert.ok(patternsChecked > 100, `quét quá ít cách cục (${patternsChecked})`);
   console.log(`patterns-vi regression passed (${seen.size} cách cục khác nhau, ${patternsChecked} lượt)`);
 }

@@ -1,7 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
-import type { ZiweiChart } from '@/lib/ziwei/types';
-import { detectPatterns } from '@/lib/ziwei/patterns';
+import type { Pattern } from '@/lib/ziwei/patterns';
 import { tv } from '@/lib/i18n/vi';
 import { tvPatternName } from '@/lib/i18n/chart-extra';
 import { tvPatternText, tvPatternList } from '@/lib/i18n/patterns-vi';
@@ -13,8 +12,8 @@ const LevelStyle = {
   caution:   { dot: 'bg-orange-500', label: 'text-orange-500', badge: 'text-orange-500 bg-orange-500/10 border-orange-500/25' },
 };
 
-export default function PatternsCard({ chart }: { chart: ZiweiChart }) {
-  const patterns = detectPatterns(chart);
+// patterns.ts là server-only: phía server gọi detectPatterns(chart) rồi truyền kết quả xuống.
+export default function PatternsCard({ patterns }: { patterns: Pattern[] }) {
   if (patterns.length === 0) return null;
 
   return (
